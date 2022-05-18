@@ -1,7 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -29,9 +30,24 @@ async function run() {
     await client.connect();
     console.log('database connected');
 
+    app.get('/tasks', async (req, res) => {
+        const { email } = req.query;
+        const query = { userName: email };
+        const cursor = taskCollection.find(query);
+        const tasks = await cursor.toArray();
+        res.send(tasks);
+    });
+
     app.post('/add', async (req, res) => {
         const task = req.body;
         const result = await taskCollection.insertOne(task);
+        res.send(result);
+    });
+
+    app.delete('/delete', async (req, res) => {
+        const task = req.body;
+        const query = { _id: ObjectId(task._id) };
+        const result = await taskCollection.deleteOne(query);
         res.send(result);
     });
 }
