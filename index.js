@@ -50,6 +50,19 @@ async function run() {
         const result = await taskCollection.deleteOne(query);
         res.send(result);
     });
+
+    app.patch('/update', async (req, res) => {
+        const updatedTask = req.body;
+
+        const filter = { _id: ObjectId(updatedTask._id) };
+        const updatedDoc = {
+            $set: {
+                completed: true,
+            },
+        };
+        const result = await taskCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+    });
 }
 run().catch(console.dir);
 
